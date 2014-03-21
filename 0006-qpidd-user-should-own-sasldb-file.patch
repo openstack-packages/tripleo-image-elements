@@ -1,0 +1,26 @@
+From 4c4f957f63218a8afdc0cddaad1d412d97103f6e Mon Sep 17 00:00:00 2001
+From: Richard Su <rwsu@redhat.com>
+Date: Thu, 20 Mar 2014 13:01:35 -0700
+Subject: [PATCH] qpidd user should own sasldb file
+
+The file is currently created as root but should by owned by qpidd.
+
+Change-Id: I1e02f52481fcc8de0f4fe8896b2d7833e6273e44
+---
+ elements/qpidd/os-refresh-config/post-configure.d/73-qpidd | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/elements/qpidd/os-refresh-config/post-configure.d/73-qpidd b/elements/qpidd/os-refresh-config/post-configure.d/73-qpidd
+index 39adc9c..1980e86 100755
+--- a/elements/qpidd/os-refresh-config/post-configure.d/73-qpidd
++++ b/elements/qpidd/os-refresh-config/post-configure.d/73-qpidd
+@@ -6,5 +6,6 @@ password=$(os-apply-config --key qpid.password)
+ 
+ sasldb_file=$(grep sasldb_path /etc/sasl2/qpidd.conf | cut -d \: -f 2 | cut -d " " -f 2)
+ echo "$password" | saslpasswd2 -c -p -f $sasldb_file -u QPID $username
++chown qpidd.qpidd $sasldb_file
+ 
+ service qpidd restart
+-- 
+1.8.5.3
+

@@ -1,0 +1,46 @@
+From 43435a1db172e2226c0bab8f6842631cac1e8869 Mon Sep 17 00:00:00 2001
+From: James Slagle <jslagle@redhat.com>
+Date: Tue, 18 Mar 2014 17:11:57 -0400
+Subject: [PATCH] Remove mostly empty directories
+
+The os-apply-config and os-config-applier directories are empty other
+than 1 hidden file in each. This appears to be the case just so that
+they will exist when the rsync commands run to install the templates
+into the image. It's possible the directories won't exist otherwise if
+no elements provided any templates.
+
+Instead of using empty directories and hidden files to force them to
+exist in git, just check for the existence of each directory before
+running the rsync commands.
+
+Change-Id: I0f286a28601c292b5f70258747def36a08d93a87
+---
+ elements/os-apply-config/install.d/99-install-config-templates | 4 ++--
+ elements/os-apply-config/os-apply-config/.os-config-applier    | 0
+ elements/os-apply-config/os-config-applier/.os-config-applier  | 0
+ 3 files changed, 2 insertions(+), 2 deletions(-)
+ delete mode 100644 elements/os-apply-config/os-apply-config/.os-config-applier
+ delete mode 100644 elements/os-apply-config/os-config-applier/.os-config-applier
+
+diff --git a/elements/os-apply-config/install.d/99-install-config-templates b/elements/os-apply-config/install.d/99-install-config-templates
+index dd7ab07..1fe1563 100755
+--- a/elements/os-apply-config/install.d/99-install-config-templates
++++ b/elements/os-apply-config/install.d/99-install-config-templates
+@@ -6,6 +6,6 @@
+ set -eux
+ TEMPLATE_ROOT=$(os-apply-config --print-templates)
+ TEMPLATE_SOURCE=$(dirname $0)/../os-config-applier
+-rsync --exclude='.*.swp' -Cr $TEMPLATE_SOURCE/ $TEMPLATE_ROOT/
++[ -d $TEMPLATE_SOURCE ] && rsync --exclude='.*.swp' -Cr $TEMPLATE_SOURCE/ $TEMPLATE_ROOT/
+ TEMPLATE_SOURCE=$(dirname $0)/../os-apply-config
+-rsync --exclude='.*.swp' -Cr $TEMPLATE_SOURCE/ $TEMPLATE_ROOT/
++[ -d $TEMPLATE_SOURCE ] && rsync --exclude='.*.swp' -Cr $TEMPLATE_SOURCE/ $TEMPLATE_ROOT/
+diff --git a/elements/os-apply-config/os-apply-config/.os-config-applier b/elements/os-apply-config/os-apply-config/.os-config-applier
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/elements/os-apply-config/os-config-applier/.os-config-applier b/elements/os-apply-config/os-config-applier/.os-config-applier
+deleted file mode 100644
+index e69de29..0000000
+-- 
+1.8.5.3
+

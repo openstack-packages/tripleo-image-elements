@@ -1,0 +1,37 @@
+From f21444ce2f453608a48e40b5750652caee2776a0 Mon Sep 17 00:00:00 2001
+From: Richard Su <rwsu@redhat.com>
+Date: Tue, 18 Mar 2014 22:58:09 -0700
+Subject: [PATCH] Custom service file is not needed for qpidd on systemd based
+ hosts
+
+Change-Id: I788f8c0a55f06e8dbb923e2ae867aa9def350ede
+---
+ elements/qpidd/install.d/20-qpidd | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/elements/qpidd/install.d/20-qpidd b/elements/qpidd/install.d/20-qpidd
+index 9e50174..5dbb4f1 100755
+--- a/elements/qpidd/install.d/20-qpidd
++++ b/elements/qpidd/install.d/20-qpidd
+@@ -17,18 +17,6 @@ post-start exec sleep 1
+ eof
+ }
+ 
+-function install_qpidd_systemd {
+-  cat > /etc/systemd/system/qpidd.service << eof
+-.include /lib/systemd/system/qpidd.service
+-[Unit]
+-Before=rc-local.service
+-Restart=on-failure
+-eof
+-}
+-
+-
+ if [ "$DIB_INIT_SYSTEM" == "upstart" ]; then
+     install_qpidd_upstart
+-elif [ "$DIB_INIT_SYSTEM" == "systemd" ]; then
+-    install_qpidd_systemd
+ fi
+-- 
+1.8.5.3
+

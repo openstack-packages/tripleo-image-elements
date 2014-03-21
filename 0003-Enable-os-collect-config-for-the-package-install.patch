@@ -1,0 +1,26 @@
+From 3c843ec24d7d76c5a2203575f4284585467ae603 Mon Sep 17 00:00:00 2001
+From: James Slagle <jslagle@redhat.com>
+Date: Thu, 20 Mar 2014 17:58:49 -0400
+Subject: [PATCH] Enable os-collect-config for the package install
+
+The packaged os-collect-config does not automatically enable the
+os-collect-config service, this adds a step to do so.
+
+Change-Id: Ifa536e5e0570ea7c7513f6e722d85ca6776b99a8
+---
+ .../install.d/os-collect-config-package-install/10-os-collect-config    | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/elements/os-collect-config/install.d/os-collect-config-package-install/10-os-collect-config b/elements/os-collect-config/install.d/os-collect-config-package-install/10-os-collect-config
+index f5d9e0c..99cbad7 100644
+--- a/elements/os-collect-config/install.d/os-collect-config-package-install/10-os-collect-config
++++ b/elements/os-collect-config/install.d/os-collect-config-package-install/10-os-collect-config
+@@ -3,3 +3,5 @@
+ set -eux
+ 
+ install-packages os-collect-config
++
++os-svc-enable -n os-collect-config
+-- 
+1.8.5.3
+
