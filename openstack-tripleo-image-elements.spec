@@ -4,7 +4,7 @@
 Name:		openstack-tripleo-image-elements
 Summary:	OpenStack TripleO Image Elements for diskimage-builder
 Version:	0.6.3
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	ASL 2.0
 Group:		System Environment/Base
 URL:		https://wiki.openstack.org/wiki/TripleO
@@ -42,6 +42,17 @@ Patch0006:	0006-qpidd-user-should-own-sasldb-file.patch
 # be in the icehouse-3 package which is not yet available.
 Patch0007:	0007-No-neutron-db-manage-upgrade-head.patch
 
+# https://review.openstack.org/82387
+# git format-patch -1 3769f6c6c393a62a33a3b7c680943d3ddc70eaeb
+Patch008:	0008-Add-missing-x.patch
+
+# https://review.openstack.org/82529
+# git format-patch -1 2e37cf5ba9499ae99d86f017ecb9cf72a206a022
+Patch0009:	0009-Create-and-use-libvirtd-group-for-package-install.patch
+
+# No service for swift-container-sync exists in rdo, temporarily patch the
+# enable and restart for this service out until we figure out the right fix.
+Patch0010:	0010-No-swift-continer-sync-service.patch
 
 BuildArch:	noarch
 BuildRequires:	python
@@ -67,6 +78,9 @@ program.
 %patch0005 -p1
 %patch0006 -p1
 %patch0007 -p1
+%patch0008 -p1
+%patch0009 -p1
+%patch0010 -p1
 
 %build
 %{__python} setup.py build
@@ -86,6 +100,10 @@ find %{buildroot} -name .git-keep-empty | xargs rm -f
 %{_datadir}/tripleo-image-elements
 
 %changelog
+* Sun Mar 23 2014 James Slagle <jslagle@redhat.com> - 0.6.3-2
+- Add Patch 0008-Add-missing-x.patch
+- Add Patch 0009-Create-and-use-libvirtd-group-for-package-install.patch
+
 * Fri Mar 21 2014 James Slagle <jslagle@redhat.com> - 0.6.3-1
 - Rebase onto 0.6.3
 
