@@ -1,0 +1,43 @@
+From 1f3d64e5a21f0a9e32d76d0fb1cdf6c68f0b5614 Mon Sep 17 00:00:00 2001
+From: James Slagle <jslagle@redhat.com>
+Date: Tue, 25 Mar 2014 08:32:33 -0400
+Subject: [PATCH] Expose dnsmasq options
+
+Expose the ability to set dnsmasq options for neutron dhcp agent. This
+will allow us to configure mtu to be 1400 for tenant instances on the
+overcloud.  This should help with poor network performance and vm's that
+are just plain unreachable via ssh due to the GRE tunnel overhead.
+
+This will use a corresponding change to tripleo-heat-templates:
+If24326045987b5a484ba2f71f591092987966536
+
+Change-Id: I7dba10406a8560b5e177b5a983485d637cca3105
+Partial-Bug: #1270646
+---
+ elements/neutron/os-apply-config/etc/neutron/dhcp_agent.ini       | 4 ++++
+ elements/neutron/os-apply-config/etc/neutron/dnsmasq-neutron.conf | 1 +
+ 2 files changed, 5 insertions(+)
+ create mode 100644 elements/neutron/os-apply-config/etc/neutron/dnsmasq-neutron.conf
+
+diff --git a/elements/neutron/os-apply-config/etc/neutron/dhcp_agent.ini b/elements/neutron/os-apply-config/etc/neutron/dhcp_agent.ini
+index e8cc602..1b07e33 100644
+--- a/elements/neutron/os-apply-config/etc/neutron/dhcp_agent.ini
++++ b/elements/neutron/os-apply-config/etc/neutron/dhcp_agent.ini
+@@ -8,3 +8,7 @@ state_path = /var/run/neutron
+ interface_driver = neutron.agent.linux.interface.OVSInterfaceDriver
+ dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
+ use_namespaces = True
++
++{{#neutron.dnsmasq-options}}
++dnsmasq_config_file=/etc/neutron/dnsmasq-neutron.conf
++{{/neutron.dnsmasq-options}}
+diff --git a/elements/neutron/os-apply-config/etc/neutron/dnsmasq-neutron.conf b/elements/neutron/os-apply-config/etc/neutron/dnsmasq-neutron.conf
+new file mode 100644
+index 0000000..03ca340
+--- /dev/null
++++ b/elements/neutron/os-apply-config/etc/neutron/dnsmasq-neutron.conf
+@@ -0,0 +1 @@
++{{neutron.dnsmasq-options}}
+-- 
+1.8.5.3
+

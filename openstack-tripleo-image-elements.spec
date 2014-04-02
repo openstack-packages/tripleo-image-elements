@@ -4,7 +4,7 @@
 Name:		openstack-tripleo-image-elements
 Summary:	OpenStack TripleO Image Elements for diskimage-builder
 Version:	0.6.3
-Release:	2%{?dist}
+Release:	5%{?dist}
 License:	ASL 2.0
 Group:		System Environment/Base
 URL:		https://wiki.openstack.org/wiki/TripleO
@@ -52,7 +52,29 @@ Patch0009:	0009-Create-and-use-libvirtd-group-for-package-install.patch
 
 # No service for swift-container-sync exists in rdo, temporarily patch the
 # enable and restart for this service out until we figure out the right fix.
+# https://review.openstack.org/#/c/82625/
 Patch0010:	0010-No-swift-continer-sync-service.patch
+
+# Workaround for:
+# https://bugzilla.redhat.com/show_bug.cgi?id=1080438
+# /etc/neutron/plugins/openvswitch/ovs_neutron_plugin.ini should be in the neutron group.
+# Should probably be submitted upstream if we don't get a fixed RDO package.
+Patch0011:	0011-ovs-neutron-plugin-ini-neutron-group
+
+# openstack-cinder no longer requires scsi-target-utils, so we must install the
+# package manually.
+# Once upstream is refactored into cinder-tgt and cinder-lio support, we can
+# just build images with the element we need:
+# https://review.openstack.org/#/c/78462/
+Patch0012:	0012-cinder-install-tgt.patch
+
+# https://review.openstack.org/#/c/82804/
+# git format-patch -1 1f3d64e5a21f0a9e32d76d0fb1cdf6c68f0b5614
+Patch0013:	0013-Expose-dnsmasq-options.patch
+
+# Patch cinder.conf to set lock_path, volumes_dir, iscsi_helper.
+# Needs to be submitted upstream.
+Patch0014:	0014-Cinder-conf-patch.patch
 
 BuildArch:	noarch
 BuildRequires:	python
@@ -81,6 +103,10 @@ program.
 %patch0008 -p1
 %patch0009 -p1
 %patch0010 -p1
+%patch0011 -p1
+%patch0012 -p1
+%patch0013 -p1
+%patch0014 -p1
 
 %build
 %{__python} setup.py build
@@ -100,6 +126,16 @@ find %{buildroot} -name .git-keep-empty | xargs rm -f
 %{_datadir}/tripleo-image-elements
 
 %changelog
+* Thu Mar 27 2014 James Slagle <jslagle@redhat.com> - 0.6.3-5
+- Add patch for cinder.conf
+
+* Wed Mar 26 2014 James Slagle <jslagle@redhat.com> - 0.6.3-4
+- Fix 0002-Fix-tgt-target-in-cinder-element.patch, which was misgenerated
+  before
+
+* Tue Mar 25 2014 James Slagle <jslagle@redhat.com> - 0.6.3-3
+- Add additional patches for some needed workarounds.
+
 * Sun Mar 23 2014 James Slagle <jslagle@redhat.com> - 0.6.3-2
 - Add Patch 0008-Add-missing-x.patch
 - Add Patch 0009-Create-and-use-libvirtd-group-for-package-install.patch

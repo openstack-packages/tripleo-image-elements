@@ -1,0 +1,27 @@
+From c7a32feed0110e61e8f12333f36b2298a7947a79 Mon Sep 17 00:00:00 2001
+From: James Slagle <jslagle@redhat.com>
+Date: Tue, 25 Mar 2014 16:22:48 -0400
+Subject: [PATCH] Neutron patch
+
+Change-Id: I51626012237dcc3eed3b0c1e8427d23594277fc9
+---
+ .../install.d/neutron-package-install/80-neutron-openvswitch-agent  | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/elements/neutron-openvswitch-agent/install.d/neutron-package-install/80-neutron-openvswitch-agent b/elements/neutron-openvswitch-agent/install.d/neutron-package-install/80-neutron-openvswitch-agent
+index 3c14c42..5b63d58 100755
+--- a/elements/neutron-openvswitch-agent/install.d/neutron-package-install/80-neutron-openvswitch-agent
++++ b/elements/neutron-openvswitch-agent/install.d/neutron-package-install/80-neutron-openvswitch-agent
+@@ -5,3 +5,9 @@ set -eux
+ install-packages openstack-neutron-openvswitch
+ 
+ os-svc-daemon -n neutron-openvswitch-agent -u neutron -c noop -d
++
++# Workaround for:
++# https://bugzilla.redhat.com/show_bug.cgi?id=1080438
++# /etc/neutron/plugins/openvswitch/ovs_neutron_plugin.ini should be in the
++# neutron group.
++chgrp neutron /etc/neutron/plugins/openvswitch/ovs_neutron_plugin.ini
+-- 
+1.8.5.3
+

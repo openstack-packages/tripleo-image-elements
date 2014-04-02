@@ -1,0 +1,33 @@
+From 8b86ab0731522f969a47be545ef3457760f58926 Mon Sep 17 00:00:00 2001
+From: Ryan Brady <rbrady@redhat.com>
+Date: Thu, 20 Mar 2014 09:04:33 -0400
+Subject: [PATCH] Fix tgt target in cinder element
+
+The package install version creates a file at /etc/tgt/conf.d/cinder.conf
+and the cinder element has been adding an additional file. This would have
+the effect of the source install working properly, but the package install
+would end up creating volumes in /etc/cinder/volume instead of /mnt/state.
+
+This patch changes the tgt target to be written to the existing file to
+bring both the source and package installs to behave the same.
+
+Change-Id: Ieeaa9518d6ed50595fbd70f1bbf0a17e3b5b1894
+---
+ elements/cinder/install.d/73-cinder | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/elements/cinder/install.d/73-cinder b/elements/cinder/install.d/73-cinder
+index 3d0260b..fd03d2e 100755
+--- a/elements/cinder/install.d/73-cinder
++++ b/elements/cinder/install.d/73-cinder
+@@ -6,5 +6,5 @@ mkdir -p /etc/tgt/conf.d
+ install -d -o root -g cinder -m 0770 /var/lib/cinder/volumes
+ install -d -o root -g cinder -m 0770 /var/lib/cinder/nfs
+ register-state-path /var/lib/cinder
+-echo 'include /etc/tgt/conf.d/cinder_tgt.conf' > /etc/tgt/targets.conf
+-echo 'include /mnt/state/var/lib/cinder/volumes/*' > /etc/tgt/conf.d/cinder_tgt.conf
++echo 'include /etc/tgt/conf.d/cinder.conf' > /etc/tgt/targets.conf
++echo 'include /mnt/state/var/lib/cinder/volumes/*' > /etc/tgt/conf.d/cinder.conf
+-- 
+1.8.5.3
+
