@@ -4,7 +4,7 @@
 Name:		openstack-tripleo-image-elements
 Summary:	OpenStack TripleO Image Elements for diskimage-builder
 Version:	0.6.3
-Release:	6%{?dist}
+Release:	7%{?dist}
 License:	ASL 2.0
 Group:		System Environment/Base
 URL:		https://wiki.openstack.org/wiki/TripleO
@@ -134,6 +134,18 @@ program.
 # remove .git-keep-empty files that get installed
 find %{buildroot} -name .git-keep-empty | xargs rm -f
 
+# These are the scripts created by our patches, but the patches don't bring +x
+# along with them, so to avoid some rpmlint errors, +x them here. Once patches
+# are marged upstream, these lines can be removed.
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/nova-baremetal/os-refresh-config/configure.d/82-nova-baremetal-selinux
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/keystone/os-refresh-config/configure.d/10-keystone-state
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/keystone/os-refresh-config/configure.d/20-keystone-selinux
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/neutron/os-refresh-config/configure.d/10-neutron-state
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/neutron/os-refresh-config/configure.d/20-neutron-selinux
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/glance/os-refresh-config/configure.d/10-glance-state
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/glance/os-refresh-config/configure.d/20-glance-selinux
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/nova/os-refresh-config/configure.d/20-nova-selinux
+
 %files
 %doc LICENSE
 %doc README.md
@@ -143,6 +155,9 @@ find %{buildroot} -name .git-keep-empty | xargs rm -f
 %{_datadir}/tripleo-image-elements
 
 %changelog
+* Thu Apr 03 2014 James Slagle <jslagle@redhat.com> - 0.6.3-7
+- Add +x to newly added files from patches
+
 * Thu Apr 03 2014 James Slagle <jslagle@redhat.com> - 0.6.3-6
 - Add patches for improved SELinux support.
 
