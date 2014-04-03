@@ -1,0 +1,61 @@
+From 71a8e8e54c71181452d7c784c7d0c46df4cae6ed Mon Sep 17 00:00:00 2001
+From: Richard Su <rwsu@redhat.com>
+Date: Tue, 25 Mar 2014 12:06:59 -0700
+Subject: [PATCH 2/5] Update keystone's selinux policies
+
+Allow openssl to read keystone ssl files.
+
+Move /mnt/state directory creation to configure.d.
+
+Change-Id: I75ccbaf3fa4efde1c48340de7c63efa30652e3e0
+---
+ .../keystone/os-refresh-config/configure.d/10-keystone-state     | 5 +++++
+ .../keystone/os-refresh-config/configure.d/20-keystone-selinux   | 9 +++++++++
+ elements/keystone/os-refresh-config/post-configure.d/70-keystone | 3 ---
+ 3 files changed, 14 insertions(+), 3 deletions(-)
+ create mode 100755 elements/keystone/os-refresh-config/configure.d/10-keystone-state
+ create mode 100755 elements/keystone/os-refresh-config/configure.d/20-keystone-selinux
+
+diff --git a/elements/keystone/os-refresh-config/configure.d/10-keystone-state b/elements/keystone/os-refresh-config/configure.d/10-keystone-state
+new file mode 100755
+index 0000000..1448241
+--- /dev/null
++++ b/elements/keystone/os-refresh-config/configure.d/10-keystone-state
+@@ -0,0 +1,5 @@
++#!/bin/bash
++set -eu
++
++[ -d /mnt/state/etc/keystone/ssl/certs ] || install -m 0750 -o keystone -g keystone -d /mnt/state/etc/keystone/ssl/certs
++[ -d /mnt/state/etc/keystone/ssl/private ] || install -m 0750 -o keystone -g keystone -d /mnt/state/etc/keystone/ssl/private
+diff --git a/elements/keystone/os-refresh-config/configure.d/20-keystone-selinux b/elements/keystone/os-refresh-config/configure.d/20-keystone-selinux
+new file mode 100755
+index 0000000..43a85d3
+--- /dev/null
++++ b/elements/keystone/os-refresh-config/configure.d/20-keystone-selinux
+@@ -0,0 +1,9 @@
++#!/bin/bash
++set -eu
++
++# Allow openssl to read keys
++
++[ -x /usr/sbin/semanage ] || exit 0
++
++semanage fcontext -a -t cert_t "/mnt/state/etc/keystone/ssl(/.*)?"
++restorecon -Rv /mnt/state/etc/keystone/ssl
+diff --git a/elements/keystone/os-refresh-config/post-configure.d/70-keystone b/elements/keystone/os-refresh-config/post-configure.d/70-keystone
+index ca8a412..30c5634 100755
+--- a/elements/keystone/os-refresh-config/post-configure.d/70-keystone
++++ b/elements/keystone/os-refresh-config/post-configure.d/70-keystone
+@@ -1,9 +1,6 @@
+ #!/bin/bash
+ set -eu
+ 
+-# NB: pki_setup chowns things appropriately.
+-mkdir -p /mnt/state/etc/keystone/ssl
+-
+ keystone-manage db_sync
+ 
+ os-svc-enable -n keystone
+-- 
+1.9.0
+

@@ -1,0 +1,67 @@
+From 4b2ae36da4ea3b21980a1e570f18ace3888961dc Mon Sep 17 00:00:00 2001
+From: Richard Su <rwsu@redhat.com>
+Date: Tue, 25 Mar 2014 12:05:34 -0700
+Subject: [PATCH 3/5] Update neutron's selinux policies
+
+Allow neutron permission to /mnt/state and /var/run.
+
+Move directory creation from post-configure.d to configure.d.
+
+Change-Id: Ia4ea5b84bbbe69b6d2e72a5b4d7a691d5213bdfa
+---
+ .../os-refresh-config/post-configure.d/80-neutron-server    |  4 ----
+ .../neutron/os-refresh-config/configure.d/10-neutron-state  |  6 ++++++
+ .../os-refresh-config/configure.d/20-neutron-selinux        | 13 +++++++++++++
+ 3 files changed, 19 insertions(+), 4 deletions(-)
+ create mode 100644 elements/neutron/os-refresh-config/configure.d/10-neutron-state
+ create mode 100755 elements/neutron/os-refresh-config/configure.d/20-neutron-selinux
+
+diff --git a/elements/neutron-server/os-refresh-config/post-configure.d/80-neutron-server b/elements/neutron-server/os-refresh-config/post-configure.d/80-neutron-server
+index 6d05722..2f7ab3b 100755
+--- a/elements/neutron-server/os-refresh-config/post-configure.d/80-neutron-server
++++ b/elements/neutron-server/os-refresh-config/post-configure.d/80-neutron-server
+@@ -1,10 +1,6 @@
+ #!/bin/bash
+ set -eux
+ 
+-[ -d /mnt/state/var/lib/neutron ] || {
+-    install -d -D -m 0770 -o neutron -g neutron /mnt/state/var/lib/neutron
+-}
+-
+ os-svc-enable -n neutron-server
+ 
+ os-svc-restart -n neutron-server
+diff --git a/elements/neutron/os-refresh-config/configure.d/10-neutron-state b/elements/neutron/os-refresh-config/configure.d/10-neutron-state
+new file mode 100644
+index 0000000..613d44a
+--- /dev/null
++++ b/elements/neutron/os-refresh-config/configure.d/10-neutron-state
+@@ -0,0 +1,6 @@
++#!/bin/bash
++set -eu
++
++[ -d /mnt/state/var/lib/neutron ] || install -d -D -m 0770 -o neutron -g neutron /mnt/state/var/lib/neutron
++[ -d /var/run/neutron ] || install -D -m 0775 -o neutron -g neutron -d /var/run/neutron
++[ -d /mnt/state/var/log/neutron ] || install -D -m 0775 -o neutron -g neutron -d /mnt/state/var/log/neutron
+diff --git a/elements/neutron/os-refresh-config/configure.d/20-neutron-selinux b/elements/neutron/os-refresh-config/configure.d/20-neutron-selinux
+new file mode 100755
+index 0000000..45b0a05
+--- /dev/null
++++ b/elements/neutron/os-refresh-config/configure.d/20-neutron-selinux
+@@ -0,0 +1,13 @@
++#!/bin/bash
++set -eu
++
++[ -x /usr/sbin/semanage ] || exit 0
++
++semanage fcontext -a -t neutron_var_lib_t "/mnt/state/var/lib/neutron(/.*)?"
++restorecon -Rv /mnt/state/var/lib/neutron
++
++semanage fcontext -a -t neutron_var_lib_t "/var/run/neutron(/.*)?"
++restorecon -Rv /var/run/neutron
++
++semanage fcontext -a -t neutron_log_t "/mnt/state/var/log/neutron(/.*)?"
++restorecon -Rv /mnt/state/var/log/neutron
+-- 
+1.9.0
+

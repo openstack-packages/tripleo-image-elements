@@ -4,7 +4,7 @@
 Name:		openstack-tripleo-image-elements
 Summary:	OpenStack TripleO Image Elements for diskimage-builder
 Version:	0.6.3
-Release:	5%{?dist}
+Release:	6%{?dist}
 License:	ASL 2.0
 Group:		System Environment/Base
 URL:		https://wiki.openstack.org/wiki/TripleO
@@ -76,6 +76,18 @@ Patch0013:	0013-Expose-dnsmasq-options.patch
 # Needs to be submitted upstream.
 Patch0014:	0014-Cinder-conf-patch.patch
 
+# Next 5 patches are fixes for SELinux support.
+# https://review.openstack.org/#/c/84949/
+Patch0015:	0015-Relabel-tftpboot-if-selinux-is-used.patch
+# https://review.openstack.org/#/c/82981/
+Patch0016:	0016-Update-keystone-s-selinux-policies.patch
+# https://review.openstack.org/#/c/82980/
+Patch0017:	0017-Update-neutron-s-selinux-policies.patch
+# https://review.openstack.org/#/c/82978/
+Patch0018:	0018-Update-glance-s-selinux-policies.patch
+# https://review.openstack.org/#/c/82976/
+Patch0019:	0019-Update-nova-s-selinux-policies.patch
+
 BuildArch:	noarch
 BuildRequires:	python
 BuildRequires:	python2-devel
@@ -107,6 +119,11 @@ program.
 %patch0012 -p1
 %patch0013 -p1
 %patch0014 -p1
+%patch0015 -p1
+%patch0016 -p1
+%patch0017 -p1
+%patch0018 -p1
+%patch0019 -p1
 
 %build
 %{__python} setup.py build
@@ -126,6 +143,9 @@ find %{buildroot} -name .git-keep-empty | xargs rm -f
 %{_datadir}/tripleo-image-elements
 
 %changelog
+* Thu Apr 03 2014 James Slagle <jslagle@redhat.com> - 0.6.3-6
+- Add patches for improved SELinux support.
+
 * Thu Mar 27 2014 James Slagle <jslagle@redhat.com> - 0.6.3-5
 - Add patch for cinder.conf
 

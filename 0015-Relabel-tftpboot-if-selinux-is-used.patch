@@ -1,0 +1,35 @@
+From 57bb48090fd0c3bf069fd5926a4b2198e94566dc Mon Sep 17 00:00:00 2001
+From: Richard Su <rwsu@redhat.com>
+Date: Wed, 2 Apr 2014 22:48:53 -0700
+Subject: [PATCH 1/5] Relabel /tftpboot if selinux is used
+
+nova-baremetal install creates this directory. We call restorecon
+on /tftpboot so that it gets the correct label of tftpdir_t.
+
+It it is not relabeled, baremetal instances will fail to boot
+because images cannot be read if selinux is in enforcing mode.
+
+Change-Id: Id03a68a10c4379c7ba5546508dde1b874260b2d1
+---
+ .../os-refresh-config/configure.d/82-nova-baremetal-selinux       | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+ create mode 100755 elements/nova-baremetal/os-refresh-config/configure.d/82-nova-baremetal-selinux
+
+diff --git a/elements/nova-baremetal/os-refresh-config/configure.d/82-nova-baremetal-selinux b/elements/nova-baremetal/os-refresh-config/configure.d/82-nova-baremetal-selinux
+new file mode 100755
+index 0000000..a1e4719
+--- /dev/null
++++ b/elements/nova-baremetal/os-refresh-config/configure.d/82-nova-baremetal-selinux
+@@ -0,0 +1,8 @@
++#!/bin/bash
++set -eux
++
++[ -x /usr/sbin/restorecon ] || exit 0
++
++# /tftpboot is created in 80-nova-baremetal.
++# Here we are ensuring it is labeled correctly.
++restorecon -R /tftpboot
+\ No newline at end of file
+-- 
+1.9.0
+
