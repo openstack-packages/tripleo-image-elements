@@ -1,0 +1,32 @@
+From 419d45924905fd213aaf59f7f208b82806e1dcff Mon Sep 17 00:00:00 2001
+From: James Slagle <jslagle@redhat.com>
+Date: Thu, 10 Apr 2014 14:38:46 -0400
+Subject: [PATCH] Use mariadb-galera packages.
+
+RDO icehouse now has mariadb-galera packages. The galera packages
+conflict with the non-galera mariadb packages. So, we must explicitly
+install the galera packages for now. A better patch for this would
+probably be in the map-packages in diskimage-builder, but we can't patch
+that rpm.
+
+Change-Id: I28c72b62226b25af4297d28ad557cff167e825fc
+---
+ elements/mysql/install.d/10-mysql | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/elements/mysql/install.d/10-mysql b/elements/mysql/install.d/10-mysql
+index c14ba7a..a7b4564 100755
+--- a/elements/mysql/install.d/10-mysql
++++ b/elements/mysql/install.d/10-mysql
+@@ -10,7 +10,7 @@ if [ "$(dib-init-system)" = "upstart" ] ; then
+ else
+     echo WARNING: server-id will not be set on systems that boot this image!
+ fi
+-install-packages sysstat mytop percona-toolkit mysql-server-5.5 mysql-client-5.5 python-mysqldb
++install-packages sysstat mytop percona-toolkit mariadb-galera-server mariadb-galera python-mysqldb
+ # Templates write the configs into /mnt/state. However, MySQL makes it very
+ # difficult not to use this as the directory for configs.
+ rm -rf /etc/mysql
+-- 
+1.9.0
+

@@ -4,7 +4,7 @@
 Name:		openstack-tripleo-image-elements
 Summary:	OpenStack TripleO Image Elements for diskimage-builder
 Version:	0.6.3
-Release:	7%{?dist}
+Release:	8%{?dist}
 License:	ASL 2.0
 Group:		System Environment/Base
 URL:		https://wiki.openstack.org/wiki/TripleO
@@ -87,6 +87,12 @@ Patch0017:	0017-Update-neutron-s-selinux-policies.patch
 Patch0018:	0018-Update-glance-s-selinux-policies.patch
 # https://review.openstack.org/#/c/82976/
 Patch0019:	0019-Update-nova-s-selinux-policies.patch
+# https://review.openstack.org/#/c/85539/
+Patch0020:	0020--Update-swift-s-selinux-policies.patch
+
+# Patch to install mariadb-galera packages since those are now the default in
+# RDO icehouse. Need to figure out the right upstream patch for this.
+Patch0021:	0021-Use-mariadb-galera-packages.patch
 
 BuildArch:	noarch
 BuildRequires:	python
@@ -124,6 +130,8 @@ program.
 %patch0017 -p1
 %patch0018 -p1
 %patch0019 -p1
+%patch0020 -p1
+%patch0021 -p1
 
 %build
 %{__python} setup.py build
@@ -155,6 +163,10 @@ chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/nova/os-refresh-con
 %{_datadir}/tripleo-image-elements
 
 %changelog
+* Thu Apr 10 2014 James Slagle <jslagle@redhat.com> - 0.6.3-8
+- Add patch for swift SELinux policies
+- Add patch for mariadb-galera installs
+
 * Thu Apr 03 2014 James Slagle <jslagle@redhat.com> - 0.6.3-7
 - Add +x to newly added files from patches
 
