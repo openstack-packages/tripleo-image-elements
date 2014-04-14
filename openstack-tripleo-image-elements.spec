@@ -11,11 +11,9 @@ URL:		https://wiki.openstack.org/wiki/TripleO
 Source0:	http://tarballs.openstack.org/tripleo-image-elements/tripleo-image-elements-%{version}.tar.gz
 
 # https://review.openstack.org/#/c/81368/
-# git format-patch -1 77471bc5f5abb9b950f8e401634d5d2ef0a856a6
 Patch0001:	Remove-mostly-empty-directories.patch
 
 # https://review.openstack.org/#/c/81804/
-# git format-patch -1 c787432bc589cced563e4b565d76f000f8f5ef77
 Patch0002:	Fix-tgt-target-in-cinder-element.patch
 
 # No review for this upstream yet, but we need this to have a working horizon
