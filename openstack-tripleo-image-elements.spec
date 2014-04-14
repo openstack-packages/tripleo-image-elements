@@ -3,8 +3,8 @@
 
 Name:		openstack-tripleo-image-elements
 Summary:	OpenStack TripleO Image Elements for diskimage-builder
-Version:	0.6.3
-Release:	8%{?dist}
+Version:	0.6.5
+Release:	1%{?dist}
 License:	ASL 2.0
 Group:		System Environment/Base
 URL:		https://wiki.openstack.org/wiki/TripleO
@@ -12,27 +12,15 @@ Source0:	http://tarballs.openstack.org/tripleo-image-elements/tripleo-image-elem
 
 # https://review.openstack.org/#/c/81368/
 # git format-patch -1 77471bc5f5abb9b950f8e401634d5d2ef0a856a6
-Patch0001:	0001-Remove-mostly-empty-directories.patch
+Patch0001:	Remove-mostly-empty-directories.patch
 
 # https://review.openstack.org/#/c/81804/
 # git format-patch -1 c787432bc589cced563e4b565d76f000f8f5ef77
-Patch0002:	0002-Fix-tgt-target-in-cinder-element.patch
-
-# https://review.openstack.org/#/c/81927/
-# git format-patch -1 3c843ec24d7d76c5a2203575f4284585467ae603
-Patch0003:	0003-Enable-os-collect-config-for-the-package-install.patch
+Patch0002:	Fix-tgt-target-in-cinder-element.patch
 
 # No review for this upstream yet, but we need this to have a working horizon
 # from packages install.
-Patch0004:	0004-Fix-horizon-local_settings.py.patch
-
-# https://review.openstack.org/#/c/81901/
-# git format-patch -1 f21444ce2f453608a48e40b5750652caee2776a0
-Patch0005:	0005-Custom-service-file-is-not-needed-for-qpidd-on-syste.patch
-
-# https://review.openstack.org/#/c/81908/
-# git format-patch -1 4c4f957f63218a8afdc0cddaad1d412d97103f6e
-Patch0006:	0006-qpidd-user-should-own-sasldb-file.patch
+Patch0003:	Fix-horizon-local_settings.py.patch
 
 # We can't run neutron-db-manage....upgrade head in reset-db from boot-stack
 # due to this bug:
@@ -40,59 +28,42 @@ Patch0006:	0006-qpidd-user-should-own-sasldb-file.patch
 # The fix is merged: https://review.openstack.org/#/c/61663/
 # However that fix is not in openstack-neutron from rdo icehouse. It will only
 # be in the icehouse-3 package which is not yet available.
-Patch0007:	0007-No-neutron-db-manage-upgrade-head.patch
-
-# https://review.openstack.org/82387
-# git format-patch -1 3769f6c6c393a62a33a3b7c680943d3ddc70eaeb
-Patch008:	0008-Add-missing-x.patch
+Patch0004:	No-neutron-db-manage-upgrade-head.patch
 
 # https://review.openstack.org/82529
 # git format-patch -1 2e37cf5ba9499ae99d86f017ecb9cf72a206a022
-Patch0009:	0009-Create-and-use-libvirtd-group-for-package-install.patch
+Patch0005:	Create-and-use-libvirtd-group-for-package-install.patch
 
 # No service for swift-container-sync exists in rdo, temporarily patch the
 # enable and restart for this service out until we figure out the right fix.
 # https://review.openstack.org/#/c/82625/
-Patch0010:	0010-No-swift-continer-sync-service.patch
-
-# Workaround for:
-# https://bugzilla.redhat.com/show_bug.cgi?id=1080438
-# /etc/neutron/plugins/openvswitch/ovs_neutron_plugin.ini should be in the neutron group.
-# Should probably be submitted upstream if we don't get a fixed RDO package.
-Patch0011:	0011-ovs-neutron-plugin-ini-neutron-group
+Patch0006:	No-swift-continer-sync-service.patch
 
 # openstack-cinder no longer requires scsi-target-utils, so we must install the
 # package manually.
 # Once upstream is refactored into cinder-tgt and cinder-lio support, we can
 # just build images with the element we need:
 # https://review.openstack.org/#/c/78462/
-Patch0012:	0012-cinder-install-tgt.patch
-
-# https://review.openstack.org/#/c/82804/
-# git format-patch -1 1f3d64e5a21f0a9e32d76d0fb1cdf6c68f0b5614
-Patch0013:	0013-Expose-dnsmasq-options.patch
+Patch0007:	cinder-install-tgt.patch
 
 # Patch cinder.conf to set lock_path, volumes_dir, iscsi_helper.
 # Needs to be submitted upstream.
-Patch0014:	0014-Cinder-conf-patch.patch
+Patch0008:	Cinder-conf-patch.patch
 
 # Next 5 patches are fixes for SELinux support.
-# https://review.openstack.org/#/c/84949/
-Patch0015:	0015-Relabel-tftpboot-if-selinux-is-used.patch
 # https://review.openstack.org/#/c/82981/
-Patch0016:	0016-Update-keystone-s-selinux-policies.patch
+Patch0009:	Update-keystone-s-selinux-policies.patch
 # https://review.openstack.org/#/c/82980/
-Patch0017:	0017-Update-neutron-s-selinux-policies.patch
+Patch0010:	Update-neutron-s-selinux-policies.patch
 # https://review.openstack.org/#/c/82978/
-Patch0018:	0018-Update-glance-s-selinux-policies.patch
+Patch0011:	Update-glance-s-selinux-policies.patch
 # https://review.openstack.org/#/c/82976/
-Patch0019:	0019-Update-nova-s-selinux-policies.patch
+Patch0012:	Update-nova-s-selinux-policies.patch
 # https://review.openstack.org/#/c/85539/
-Patch0020:	0020--Update-swift-s-selinux-policies.patch
+Patch0013:	Update-swift-s-selinux-policies.patch
 
-# Patch to install mariadb-galera packages since those are now the default in
-# RDO icehouse. Need to figure out the right upstream patch for this.
-Patch0021:	0021-Use-mariadb-galera-packages.patch
+# https://review.openstack.org/#/c/87295/
+Patch0014:	Allow-install-mariadb-from-RDO-repository.patch
 
 BuildArch:	noarch
 BuildRequires:	python
@@ -125,13 +96,6 @@ program.
 %patch0012 -p1
 %patch0013 -p1
 %patch0014 -p1
-%patch0015 -p1
-%patch0016 -p1
-%patch0017 -p1
-%patch0018 -p1
-%patch0019 -p1
-%patch0020 -p1
-%patch0021 -p1
 
 %build
 %{__python} setup.py build
@@ -153,6 +117,11 @@ chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/neutron/os-refresh-
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/glance/os-refresh-config/configure.d/10-glance-state
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/glance/os-refresh-config/configure.d/20-glance-selinux
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/nova/os-refresh-config/configure.d/20-nova-selinux
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-rdo/install.d/10-mariadb
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-rdo/os-refresh-config/pre-configure.d/50-mariadb-socket
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-rdo/os-refresh-config/post-configure.d/40-mariadb
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-dev-rdo/pre-install.d/05-mysql-mariadb-repo
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-dev-rdo/install.d/03-mariadb-dev
 
 %files
 %doc LICENSE
@@ -163,6 +132,9 @@ chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/nova/os-refresh-con
 %{_datadir}/tripleo-image-elements
 
 %changelog
+* Mon Apr 14 2014 James Slagle <jslagle@redhat.com> - 0.6.5-1
+- Bump to 0.6.5 release, update patches
+
 * Thu Apr 10 2014 James Slagle <jslagle@redhat.com> - 0.6.3-8
 - Add patch for swift SELinux policies
 - Add patch for mariadb-galera installs

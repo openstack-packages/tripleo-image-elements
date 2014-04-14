@@ -1,0 +1,178 @@
+From ce62e0943d52b0a3ec6016cfc8b511e95590fecd Mon Sep 17 00:00:00 2001
+From: Jan Provaznik <jprovazn@redhat.com>
+Date: Mon, 14 Apr 2014 10:22:54 -0400
+Subject: [PATCH] Allow install mariadb from RDO repository
+
+Adds elements which allow installing mariadb from RDO repository.
+It's similar to mariadb element but different repo with different
+package names are used (also some installation steps might be removed
+in future).
+
+Change-Id: I8566b03a24fff7984f323442d93249e1002a6ebe
+---
+ elements/mariadb-dev-rdo/README.md                 |  4 ++
+ elements/mariadb-dev-rdo/element-provides          |  1 +
+ elements/mariadb-dev-rdo/install.d/03-mariadb-dev  |  5 +++
+ .../pre-install.d/05-mysql-mariadb-repo            |  5 +++
+ elements/mariadb-rdo/README.md                     |  4 ++
+ elements/mariadb-rdo/element-deps                  |  2 +
+ elements/mariadb-rdo/element-provides              |  1 +
+ elements/mariadb-rdo/install.d/10-mariadb          | 45 ++++++++++++++++++++++
+ .../os-refresh-config/post-configure.d/40-mariadb  |  4 ++
+ .../pre-configure.d/50-mariadb-socket              | 10 +++++
+ 10 files changed, 81 insertions(+)
+ create mode 100644 elements/mariadb-dev-rdo/README.md
+ create mode 100644 elements/mariadb-dev-rdo/element-provides
+ create mode 100755 elements/mariadb-dev-rdo/install.d/03-mariadb-dev
+ create mode 100755 elements/mariadb-dev-rdo/pre-install.d/05-mysql-mariadb-repo
+ create mode 100644 elements/mariadb-rdo/README.md
+ create mode 100644 elements/mariadb-rdo/element-deps
+ create mode 100644 elements/mariadb-rdo/element-provides
+ create mode 100755 elements/mariadb-rdo/install.d/10-mariadb
+ create mode 100755 elements/mariadb-rdo/os-refresh-config/post-configure.d/40-mariadb
+ create mode 100755 elements/mariadb-rdo/os-refresh-config/pre-configure.d/50-mariadb-socket
+
+diff --git a/elements/mariadb-dev-rdo/README.md b/elements/mariadb-dev-rdo/README.md
+new file mode 100644
+index 0000000..6f9afc1
+--- /dev/null
++++ b/elements/mariadb-dev-rdo/README.md
+@@ -0,0 +1,4 @@
++Installs mariadb devel package from RDO repository
++
++This is a separate element because different devel packages are installed for
++mysql and for mariadb.
+diff --git a/elements/mariadb-dev-rdo/element-provides b/elements/mariadb-dev-rdo/element-provides
+new file mode 100644
+index 0000000..063f2a8
+--- /dev/null
++++ b/elements/mariadb-dev-rdo/element-provides
+@@ -0,0 +1 @@
++mysql-dev
+diff --git a/elements/mariadb-dev-rdo/install.d/03-mariadb-dev b/elements/mariadb-dev-rdo/install.d/03-mariadb-dev
+new file mode 100755
+index 0000000..3a94c8a
+--- /dev/null
++++ b/elements/mariadb-dev-rdo/install.d/03-mariadb-dev
+@@ -0,0 +1,5 @@
++#!/bin/bash
++
++set -eux
++
++install-packages mariadb-galera-devel
+diff --git a/elements/mariadb-dev-rdo/pre-install.d/05-mysql-mariadb-repo b/elements/mariadb-dev-rdo/pre-install.d/05-mysql-mariadb-repo
+new file mode 100755
+index 0000000..3330193
+--- /dev/null
++++ b/elements/mariadb-dev-rdo/pre-install.d/05-mysql-mariadb-repo
+@@ -0,0 +1,5 @@
++#!/bin/bash
++
++set -eu
++
++yum -y install http://repos.fedorapeople.org/repos/openstack/openstack-icehouse/rdo-release-icehouse-2.noarch.rpm
+diff --git a/elements/mariadb-rdo/README.md b/elements/mariadb-rdo/README.md
+new file mode 100644
+index 0000000..bc29728
+--- /dev/null
++++ b/elements/mariadb-rdo/README.md
+@@ -0,0 +1,4 @@
++Installs MariaDB with galera from RDO repository
++
++This element is similar to mariadb repository but installs packages
++from RDO repository.
+diff --git a/elements/mariadb-rdo/element-deps b/elements/mariadb-rdo/element-deps
+new file mode 100644
+index 0000000..c9cef12
+--- /dev/null
++++ b/elements/mariadb-rdo/element-deps
+@@ -0,0 +1,2 @@
++mariadb-dev-rdo
++mysql-common
+diff --git a/elements/mariadb-rdo/element-provides b/elements/mariadb-rdo/element-provides
+new file mode 100644
+index 0000000..0eaebf1
+--- /dev/null
++++ b/elements/mariadb-rdo/element-provides
+@@ -0,0 +1 @@
++mysql
+diff --git a/elements/mariadb-rdo/install.d/10-mariadb b/elements/mariadb-rdo/install.d/10-mariadb
+new file mode 100755
+index 0000000..80ba40a
+--- /dev/null
++++ b/elements/mariadb-rdo/install.d/10-mariadb
+@@ -0,0 +1,45 @@
++#!/bin/bash
++
++# Install controller base requiered packages
++
++set -eux
++
++if [ "$(dib-init-system)" = "upstart" ] ; then
++    install $(dirname $0)/mysql-set-server-id.upstart /etc/init/mysql-set-server-id.conf
++else
++    echo WARNING: server-id will not be set on systems that boot this image!
++fi
++
++install-packages sysstat mytop python-mysqldb mariadb-galera-server mariadb-galera galera
++
++# Templates write the configs into /mnt/state. However, MySQL makes it very
++# difficult not to use this as the directory for configs.
++rm -rf /etc/mysql
++ln -s /mnt/state/etc/mysql /etc/mysql
++if [ -e /etc/apparmor.d/usr.sbin.mysqld ] ; then
++    sed -i -e 's,/var/lib/mysql/,/mnt/state/var/lib/mysql/,g' /etc/apparmor.d/usr.sbin.mysqld
++    sed -i -e 's,/var/log/mysql/,/mnt/state/var/log/mysql/,g' /etc/apparmor.d/usr.sbin.mysqld
++    sed -i -e 's,/etc/mysql/,/mnt/state/etc/mysql/,g' /etc/apparmor.d/usr.sbin.mysqld
++fi
++if [ -e /etc/init/mysql.conf ]; then
++    sed -i -e 's,/var/lib/mysql/,/mnt/state/var/lib/mysql/,g' /etc/init/mysql.conf
++fi
++# Fedora/RHEL install /etc/my.cnf but we do not want any unmanaged configs
++rm -f /etc/my.cnf
++# On openSUSE /var/lib/mysql is not part of the mariadb packages.
++[ -d /var/lib/mysql ] || install -d -o mysql -g root -m 0700 /var/lib/mysql
++register-state-path /var/lib/mysql
++# We need to setup the directory with appropriate permissions and then
++# the first time we boot a particular state partition we rsync this in.
++[ -d /var/log/mysql ] || install -d -o root -g mysql -m 0775 /var/log/mysql
++register-state-path /var/log/mysql
++
++# galera lib path is set in mysql config file, creating symlink
++# /usr/local/mysql/lib/libgalera_smm.so allows us to use same path
++# for mysql and mariadb and for i386/amd64
++[ -e /usr/local/mysql/lib ] || install -m 0755 -o root -g root -d /usr/local/mysql/lib
++if [ -e /usr/lib64/galera/libgalera_smm.so ];then
++  ln -sf /usr/lib64/galera/libgalera_smm.so /usr/local/mysql/lib/libgalera_smm.so
++elif [ -e /usr/lib/galera/libgalera_smm.so ];then
++  ln -sf /usr/lib/galera/libgalera_smm.so /usr/local/mysql/lib/libgalera_smm.so
++fi
+diff --git a/elements/mariadb-rdo/os-refresh-config/post-configure.d/40-mariadb b/elements/mariadb-rdo/os-refresh-config/post-configure.d/40-mariadb
+new file mode 100755
+index 0000000..948bc26
+--- /dev/null
++++ b/elements/mariadb-rdo/os-refresh-config/post-configure.d/40-mariadb
+@@ -0,0 +1,4 @@
++#!/bin/bash
++set -eu
++
++os-svc-restart -n mysql
+diff --git a/elements/mariadb-rdo/os-refresh-config/pre-configure.d/50-mariadb-socket b/elements/mariadb-rdo/os-refresh-config/pre-configure.d/50-mariadb-socket
+new file mode 100755
+index 0000000..f6b800c
+--- /dev/null
++++ b/elements/mariadb-rdo/os-refresh-config/pre-configure.d/50-mariadb-socket
+@@ -0,0 +1,10 @@
++#!/bin/bash
++set -eu
++
++# mariadb clients (from mariadb.org) expect the socket at
++# /var/lib/mysql/mysql.sock
++#
++# mysql server is started from 51-init-openstack (reset-db script) - we need to
++# create symlink to make sure reset-db will not fail
++[ -d /var/lib/mysql ] || mkdir -p /var/lib/mysql
++ln -sf /var/run/mysqld/mysqld.sock /var/lib/mysql/mysql.sock
+-- 
+1.9.0
+
