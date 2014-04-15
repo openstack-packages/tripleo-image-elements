@@ -1,4 +1,4 @@
-From ce62e0943d52b0a3ec6016cfc8b511e95590fecd Mon Sep 17 00:00:00 2001
+From 54ab168051749c4b1963b2ce443203c67598a645 Mon Sep 17 00:00:00 2001
 From: Jan Provaznik <jprovazn@redhat.com>
 Date: Mon, 14 Apr 2014 10:22:54 -0400
 Subject: [PATCH] Allow install mariadb from RDO repository
@@ -11,20 +11,20 @@ in future).
 Change-Id: I8566b03a24fff7984f323442d93249e1002a6ebe
 ---
  elements/mariadb-dev-rdo/README.md                 |  4 ++
+ elements/mariadb-dev-rdo/element-deps              |  1 +
  elements/mariadb-dev-rdo/element-provides          |  1 +
  elements/mariadb-dev-rdo/install.d/03-mariadb-dev  |  5 +++
- .../pre-install.d/05-mysql-mariadb-repo            |  5 +++
  elements/mariadb-rdo/README.md                     |  4 ++
  elements/mariadb-rdo/element-deps                  |  2 +
  elements/mariadb-rdo/element-provides              |  1 +
  elements/mariadb-rdo/install.d/10-mariadb          | 45 ++++++++++++++++++++++
  .../os-refresh-config/post-configure.d/40-mariadb  |  4 ++
  .../pre-configure.d/50-mariadb-socket              | 10 +++++
- 10 files changed, 81 insertions(+)
+ 10 files changed, 77 insertions(+)
  create mode 100644 elements/mariadb-dev-rdo/README.md
+ create mode 100644 elements/mariadb-dev-rdo/element-deps
  create mode 100644 elements/mariadb-dev-rdo/element-provides
  create mode 100755 elements/mariadb-dev-rdo/install.d/03-mariadb-dev
- create mode 100755 elements/mariadb-dev-rdo/pre-install.d/05-mysql-mariadb-repo
  create mode 100644 elements/mariadb-rdo/README.md
  create mode 100644 elements/mariadb-rdo/element-deps
  create mode 100644 elements/mariadb-rdo/element-provides
@@ -42,6 +42,13 @@ index 0000000..6f9afc1
 +
 +This is a separate element because different devel packages are installed for
 +mysql and for mariadb.
+diff --git a/elements/mariadb-dev-rdo/element-deps b/elements/mariadb-dev-rdo/element-deps
+new file mode 100644
+index 0000000..c77dd9b
+--- /dev/null
++++ b/elements/mariadb-dev-rdo/element-deps
+@@ -0,0 +1 @@
++fedora-rdo-icehouse-repository
 diff --git a/elements/mariadb-dev-rdo/element-provides b/elements/mariadb-dev-rdo/element-provides
 new file mode 100644
 index 0000000..063f2a8
@@ -60,17 +67,6 @@ index 0000000..3a94c8a
 +set -eux
 +
 +install-packages mariadb-galera-devel
-diff --git a/elements/mariadb-dev-rdo/pre-install.d/05-mysql-mariadb-repo b/elements/mariadb-dev-rdo/pre-install.d/05-mysql-mariadb-repo
-new file mode 100755
-index 0000000..3330193
---- /dev/null
-+++ b/elements/mariadb-dev-rdo/pre-install.d/05-mysql-mariadb-repo
-@@ -0,0 +1,5 @@
-+#!/bin/bash
-+
-+set -eu
-+
-+yum -y install http://repos.fedorapeople.org/repos/openstack/openstack-icehouse/rdo-release-icehouse-2.noarch.rpm
 diff --git a/elements/mariadb-rdo/README.md b/elements/mariadb-rdo/README.md
 new file mode 100644
 index 0000000..bc29728
@@ -98,7 +94,7 @@ index 0000000..0eaebf1
 +mysql
 diff --git a/elements/mariadb-rdo/install.d/10-mariadb b/elements/mariadb-rdo/install.d/10-mariadb
 new file mode 100755
-index 0000000..80ba40a
+index 0000000..2bd0dca
 --- /dev/null
 +++ b/elements/mariadb-rdo/install.d/10-mariadb
 @@ -0,0 +1,45 @@
@@ -114,7 +110,7 @@ index 0000000..80ba40a
 +    echo WARNING: server-id will not be set on systems that boot this image!
 +fi
 +
-+install-packages sysstat mytop python-mysqldb mariadb-galera-server mariadb-galera galera
++install-packages sysstat mytop python-mysqldb mariadb-rdo-galera-server mariadb-galera galera
 +
 +# Templates write the configs into /mnt/state. However, MySQL makes it very
 +# difficult not to use this as the directory for configs.

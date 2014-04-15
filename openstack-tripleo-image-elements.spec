@@ -118,7 +118,6 @@ chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/nova/os-refresh-con
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-rdo/install.d/10-mariadb
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-rdo/os-refresh-config/pre-configure.d/50-mariadb-socket
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-rdo/os-refresh-config/post-configure.d/40-mariadb
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-dev-rdo/pre-install.d/05-mysql-mariadb-repo
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-dev-rdo/install.d/03-mariadb-dev
 
 %files
