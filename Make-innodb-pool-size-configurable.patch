@@ -1,0 +1,39 @@
+From 90d83faa1138e1b8cb60eba73e11ec1b443f9678 Mon Sep 17 00:00:00 2001
+From: Jan Provaznik <jprovazn@redhat.com>
+Date: Tue, 1 Apr 2014 08:59:06 -0400
+Subject: [PATCH] Make innodb pool size configurable
+
+Alows configuring of buffer pool size and decreases default
+value to 100MB.
+
+For VMs with 2G RAM is 592MB buffer too big. Then you can hit
+an issue that openstack requests fail because there is not
+enough memory to spawn new process or mysql server restart fails
+for because it fails to allocate 592MB buffer.
+
+Change-Id: I9126c090d3d4cd03cb93735a2b0c54fa250eed61
+---
+ elements/mysql-common/os-config-applier/mnt/state/etc/mysql/my.cnf | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/elements/mysql-common/os-config-applier/mnt/state/etc/mysql/my.cnf b/elements/mysql-common/os-config-applier/mnt/state/etc/mysql/my.cnf
+index 8f5bc3a..5fa6427 100644
+--- a/elements/mysql-common/os-config-applier/mnt/state/etc/mysql/my.cnf
++++ b/elements/mysql-common/os-config-applier/mnt/state/etc/mysql/my.cnf
+@@ -48,7 +48,12 @@ innodb_log_files_in_group      = 2
+ innodb_log_file_size           = 64M
+ innodb_flush_log_at_trx_commit = 2
+ innodb_file_per_table          = 1
+-innodb_buffer_pool_size        = 592M
++{{#mysql.innodb_buffer_pool_size}}
++innodb_buffer_pool_size        = {{mysql.innodb_buffer_pool_size}}M
++{{/mysql.innodb_buffer_pool_size}}
++{{^mysql.innodb_buffer_pool_size}}
++innodb_buffer_pool_size        = 100M
++{{/mysql.innodb_buffer_pool_size}}
+ # TODO
+ # innodb_read_io_threads
+ # innodb_write_io_threads
+-- 
+1.9.0
+

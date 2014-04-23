@@ -4,7 +4,7 @@
 Name:		openstack-tripleo-image-elements
 Summary:	OpenStack TripleO Image Elements for diskimage-builder
 Version:	0.6.5
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	ASL 2.0
 Group:		System Environment/Base
 URL:		https://wiki.openstack.org/wiki/TripleO
@@ -63,6 +63,9 @@ Patch0013:	Update-swift-s-selinux-policies.patch
 # https://review.openstack.org/#/c/87295/
 Patch0014:	Allow-install-mariadb-from-RDO-repository.patch
 
+# https://review.openstack.org/#/c/86889/
+Patch0015:	Make-innodb-pool-size-configurable.patch
+
 BuildArch:	noarch
 BuildRequires:	python
 BuildRequires:	python2-devel
@@ -94,6 +97,7 @@ program.
 %patch0012 -p1
 %patch0013 -p1
 %patch0014 -p1
+%patch0015 -p1
 
 %build
 %{__python} setup.py build
@@ -129,6 +133,9 @@ chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-dev-rdo/ins
 %{_datadir}/tripleo-image-elements
 
 %changelog
+* Wed Apr 23 2014 James Slagle <jslagle@redhat.com> - 0.6.5-2
+- Add patch Make-innodb-pool-size-configurable.patch
+
 * Mon Apr 14 2014 James Slagle <jslagle@redhat.com> - 0.6.5-1
 - Bump to 0.6.5 release, update patches
 
