@@ -4,7 +4,7 @@
 Name:		openstack-tripleo-image-elements
 Summary:	OpenStack TripleO Image Elements for diskimage-builder
 Version:	0.6.5
-Release:	2%{?dist}
+Release:	3%{?dist}
 License:	ASL 2.0
 Group:		System Environment/Base
 URL:		https://wiki.openstack.org/wiki/TripleO
@@ -118,10 +118,14 @@ chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/neutron/os-refresh-
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/neutron/os-refresh-config/configure.d/20-neutron-selinux
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/glance/os-refresh-config/configure.d/10-glance-state
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/glance/os-refresh-config/configure.d/20-glance-selinux
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/swift-storage/os-refresh-config/configure.d/10-swift-storage-state
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/swift-storage/os-refresh-config/configure.d/20-swift-storage-selinux
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/nova/os-refresh-config/configure.d/20-nova-selinux
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-rdo/install.d/10-mariadb
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-rdo/os-refresh-config/pre-configure.d/50-mariadb-socket
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-rdo/os-refresh-config/post-configure.d/40-mariadb
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb/install.d/10-mariadb-packages
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-common/install.d/11-mariadb
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-common/os-refresh-config/post-configure.d/40-mariadb
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-common/os-refresh-config/pre-configure.d/50-mariadb-socket
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-rdo/install.d/10-mariadb-packages
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-dev-rdo/install.d/03-mariadb-dev
 
 %files
@@ -133,6 +137,12 @@ chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-dev-rdo/ins
 %{_datadir}/tripleo-image-elements
 
 %changelog
+* Fri Apr 25 2014 James Slagle <jslagle@redhat.com> - 0.6.5-3
+- Update patch Allow-install-mariadb-from-RDO-repository.patch
+  since mariadb-galera-devel is no longer available, it's just plain
+  mariadb-devel
+- Make files from swift selinux patch +x
+
 * Wed Apr 23 2014 James Slagle <jslagle@redhat.com> - 0.6.5-2
 - Add patch Make-innodb-pool-size-configurable.patch
 
