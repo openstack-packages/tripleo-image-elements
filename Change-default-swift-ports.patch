@@ -1,0 +1,84 @@
+From 2ad45a36fb48a31b85a39a1d4341a5e0f31ef726 Mon Sep 17 00:00:00 2001
+From: Richard Su <rwsu@redhat.com>
+Date: Wed, 25 Jun 2014 14:56:00 -0700
+Subject: [PATCH] Change default swift ports
+
+Swift ports are changed from the default 6000-6002, to 6200-6202.
+
+Ports 6000-6002 are reserved for xserver. SELinux policy developers
+do not want to have swift also operate on 6000-6002. The ports are
+being changed to 6200-6202 so that the SELinux policies can be updated
+to allow swift to use that range.
+
+See https://bugzilla.redhat.com/show_bug.cgi?id=1112823.
+
+Change-Id: I44404eff352e0527e7d0d01493a7b1b7ce4a52e5
+
+Conflicts:
+	elements/swift-storage/os-config-applier/etc/swift/account-server.conf
+	elements/swift-storage/os-config-applier/etc/swift/container-server.conf
+	elements/swift-storage/os-config-applier/etc/swift/object-server.conf
+	elements/swift/os-refresh-config/configure.d/73-swift
+---
+ .../swift-storage/os-config-applier/etc/swift/account-server.conf   | 1 +
+ .../swift-storage/os-config-applier/etc/swift/container-server.conf | 1 +
+ .../swift-storage/os-config-applier/etc/swift/object-server.conf    | 1 +
+ elements/swift/os-refresh-config/configure.d/73-swift               | 6 +++---
+ 4 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/elements/swift-storage/os-config-applier/etc/swift/account-server.conf b/elements/swift-storage/os-config-applier/etc/swift/account-server.conf
+index b438b80..67b2cd1 100644
+--- a/elements/swift-storage/os-config-applier/etc/swift/account-server.conf
++++ b/elements/swift-storage/os-config-applier/etc/swift/account-server.conf
+@@ -1,6 +1,7 @@
+ [DEFAULT]
+ # Once we have partitions dedicated to swift storage this should be removed
+ mount_check = false
++bind_port = 6202
+ 
+ [pipeline:main]
+ pipeline = healthcheck recon account-server
+diff --git a/elements/swift-storage/os-config-applier/etc/swift/container-server.conf b/elements/swift-storage/os-config-applier/etc/swift/container-server.conf
+index 62b621c..6329068 100644
+--- a/elements/swift-storage/os-config-applier/etc/swift/container-server.conf
++++ b/elements/swift-storage/os-config-applier/etc/swift/container-server.conf
+@@ -1,6 +1,7 @@
+ [DEFAULT]
+ # Once we have partitions dedicated to swift storage this should be removed
+ mount_check = false
++bind_port = 6201
+ 
+ [pipeline:main]
+ pipeline = healthcheck recon container-server
+diff --git a/elements/swift-storage/os-config-applier/etc/swift/object-server.conf b/elements/swift-storage/os-config-applier/etc/swift/object-server.conf
+index c015f6b..60f12c4 100644
+--- a/elements/swift-storage/os-config-applier/etc/swift/object-server.conf
++++ b/elements/swift-storage/os-config-applier/etc/swift/object-server.conf
+@@ -1,6 +1,7 @@
+ [DEFAULT]
+ # Once we have partitions dedicated to swift storage this should be removed
+ mount_check = false
++bind_port = 6200
+ 
+ [pipeline:main]
+ pipeline = healthcheck recon object-server
+diff --git a/elements/swift/os-refresh-config/configure.d/73-swift b/elements/swift/os-refresh-config/configure.d/73-swift
+index 5c94d45..a2e4821 100755
+--- a/elements/swift/os-refresh-config/configure.d/73-swift
++++ b/elements/swift/os-refresh-config/configure.d/73-swift
+@@ -17,9 +17,9 @@ swift-ring-builder /etc/swift/container.builder create $PARTPOWER $REPLICAS 1
+ swift-ring-builder /etc/swift/account.builder create $PARTPOWER $REPLICAS 1
+ 
+ for DEVICE in ${DEVICES//,/ } ; do
+-    swift-ring-builder /etc/swift/object.builder add ${DEVICE/\%PORT\%/6000} 100
+-    swift-ring-builder /etc/swift/container.builder add ${DEVICE/\%PORT\%/6001} 100
+-    swift-ring-builder /etc/swift/account.builder add ${DEVICE/\%PORT\%/6002} 100
++    swift-ring-builder /etc/swift/object.builder add ${DEVICE/\%PORT\%/6200} 100
++    swift-ring-builder /etc/swift/container.builder add ${DEVICE/\%PORT\%/6201} 100
++    swift-ring-builder /etc/swift/account.builder add ${DEVICE/\%PORT\%/6202} 100
+ done
+ 
+ swift-ring-builder /etc/swift/object.builder rebalance 999
+-- 
+1.9.3
+

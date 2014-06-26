@@ -4,7 +4,7 @@
 Name:		openstack-tripleo-image-elements
 Summary:	OpenStack TripleO Image Elements for diskimage-builder
 Version:	0.6.5
-Release:	4%{?dist}
+Release:	5%{?dist}
 License:	ASL 2.0
 Group:		System Environment/Base
 URL:		https://wiki.openstack.org/wiki/TripleO
@@ -66,6 +66,15 @@ Patch0014:	Allow-install-mariadb-from-RDO-repository.patch
 # https://review.openstack.org/#/c/86889/
 Patch0015:	Make-innodb-pool-size-configurable.patch
 
+# https://review.openstack.org/#/c/90245/
+Patch0016:	Fix-var-lib-mysql-selinux-labeling.patch
+
+# https://review.openstack.org/#/c/91482/
+Patch0017:	Fix-rabbitmq-server-selinux-labeling.patch
+
+# https://review.openstack.org/#/c/102687/
+Patch0018:	Change-default-swift-ports.patch
+
 BuildArch:	noarch
 BuildRequires:	python
 BuildRequires:	python2-devel
@@ -98,6 +107,9 @@ program.
 %patch0013 -p1
 %patch0014 -p1
 %patch0015 -p1
+%patch0016 -p1
+%patch0017 -p1
+%patch0018 -p1
 
 %build
 %{__python} setup.py build
@@ -127,6 +139,7 @@ chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-common/os-r
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-common/os-refresh-config/pre-configure.d/50-mariadb-socket
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-rdo/install.d/10-mariadb-packages
 chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-dev-rdo/install.d/03-mariadb-dev
+chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/rabbitmq-server/os-refresh-config/configure.d/20-rabbitmq-server-selinux
 
 %files
 %doc LICENSE
@@ -137,6 +150,9 @@ chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-dev-rdo/ins
 %{_datadir}/tripleo-image-elements
 
 %changelog
+* Thu Jun 26 2014 James Slagle <jslagle@redhat.com> - 0.6.5-5
+- Add 3 new SELinux patches
+
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.6.5-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
