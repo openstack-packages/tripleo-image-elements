@@ -157,7 +157,7 @@ chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/rabbitmq-server/os-
 %{_datadir}/tripleo-image-elements
 
 %changelog
-* Tue Jun 30 2014 James Slagle <jslagle@redhat.com> - 0.6.5-6
+* Wed Jul 1 2014 James Slagle <jslagle@redhat.com> - 0.6.5-6
 - Add patch Move-rabbitmq-server-cluster-port.patch
 
 * Thu Jun 26 2014 James Slagle <jslagle@redhat.com> - 0.6.5-5
