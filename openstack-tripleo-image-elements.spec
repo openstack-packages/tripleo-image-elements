@@ -4,7 +4,7 @@
 Name:		openstack-tripleo-image-elements
 Summary:	OpenStack TripleO Image Elements for diskimage-builder
 Version:	0.6.5
-Release:	6%{?dist}
+Release:	7%{?dist}
 License:	ASL 2.0
 Group:		System Environment/Base
 URL:		https://wiki.openstack.org/wiki/TripleO
@@ -157,6 +157,9 @@ chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/rabbitmq-server/os-
 %{_datadir}/tripleo-image-elements
 
 %changelog
+* Tue Jul 1 2014 James Slagle <jslagle@redhat.com> - 0.6.5-7
+- Bump release
+
 * Tue Jul 1 2014 James Slagle <jslagle@redhat.com> - 0.6.5-6
 - Add patch Move-rabbitmq-server-cluster-port.patch
 
