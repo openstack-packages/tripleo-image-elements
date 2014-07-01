@@ -4,7 +4,7 @@
 Name:		openstack-tripleo-image-elements
 Summary:	OpenStack TripleO Image Elements for diskimage-builder
 Version:	0.6.5
-Release:	5%{?dist}
+Release:	6%{?dist}
 License:	ASL 2.0
 Group:		System Environment/Base
 URL:		https://wiki.openstack.org/wiki/TripleO
@@ -75,6 +75,12 @@ Patch0017:	Fix-rabbitmq-server-selinux-labeling.patch
 # https://review.openstack.org/#/c/102687/
 Patch0018:	Change-default-swift-ports.patch
 
+# https://review.openstack.org/#/c/91704
+# This patch is actually a simplified version of the above.
+# The upstream patch would require also backporting the
+# sysctl element, so we'll just change the port manually.
+Patch0019:	Move-rabbitmq-server-cluster-port.patch
+
 BuildArch:	noarch
 BuildRequires:	python
 BuildRequires:	python2-devel
@@ -110,6 +116,7 @@ program.
 %patch0016 -p1
 %patch0017 -p1
 %patch0018 -p1
+%patch0019 -p1
 
 %build
 %{__python} setup.py build
@@ -150,6 +157,9 @@ chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/rabbitmq-server/os-
 %{_datadir}/tripleo-image-elements
 
 %changelog
+* Tue Jun 30 2014 James Slagle <jslagle@redhat.com> - 0.6.5-6
+- Add patch Move-rabbitmq-server-cluster-port.patch
+
 * Thu Jun 26 2014 James Slagle <jslagle@redhat.com> - 0.6.5-5
 - Add 3 new SELinux patches
 
