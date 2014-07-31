@@ -10,77 +10,6 @@ Group:		System Environment/Base
 URL:		https://wiki.openstack.org/wiki/TripleO
 Source0:	http://tarballs.openstack.org/tripleo-image-elements/tripleo-image-elements-%{version}.tar.gz
 
-# https://review.openstack.org/#/c/81368/
-Patch0001:	Remove-mostly-empty-directories.patch
-
-# https://review.openstack.org/#/c/81804/
-Patch0002:	Fix-tgt-target-in-cinder-element.patch
-
-# No review for this upstream yet, but we need this to have a working horizon
-# from packages install.
-Patch0003:	Fix-horizon-local_settings.py.patch
-
-# We can't run neutron-db-manage....upgrade head in reset-db from boot-stack
-# due to this bug:
-# https://bugs.launchpad.net/neutron/+bug/1254246
-# The fix is merged: https://review.openstack.org/#/c/61663/
-# However that fix is not in openstack-neutron from rdo icehouse. It will only
-# be in the icehouse-3 package which is not yet available.
-Patch0004:	No-neutron-db-manage-upgrade-head.patch
-
-# https://review.openstack.org/82529
-# git format-patch -1 2e37cf5ba9499ae99d86f017ecb9cf72a206a022
-Patch0005:	Create-and-use-libvirtd-group-for-package-install.patch
-
-# No service for swift-container-sync exists in rdo, temporarily patch the
-# enable and restart for this service out until we figure out the right fix.
-# https://review.openstack.org/#/c/82625/
-Patch0006:	No-swift-continer-sync-service.patch
-
-# openstack-cinder no longer requires scsi-target-utils, so we must install the
-# package manually.
-# Once upstream is refactored into cinder-tgt and cinder-lio support, we can
-# just build images with the element we need:
-# https://review.openstack.org/#/c/78462/
-Patch0007:	cinder-install-tgt.patch
-
-# Patch cinder.conf to set lock_path, volumes_dir, iscsi_helper.
-# Needs to be submitted upstream.
-Patch0008:	Cinder-conf-patch.patch
-
-# Next 5 patches are fixes for SELinux support.
-# https://review.openstack.org/#/c/82981/
-Patch0009:	Update-keystone-s-selinux-policies.patch
-# https://review.openstack.org/#/c/82980/
-Patch0010:	Update-neutron-s-selinux-policies.patch
-# https://review.openstack.org/#/c/82978/
-Patch0011:	Update-glance-s-selinux-policies.patch
-# https://review.openstack.org/#/c/82976/
-Patch0012:	Update-nova-s-selinux-policies.patch
-# https://review.openstack.org/#/c/85539/
-Patch0013:	Update-swift-s-selinux-policies.patch
-
-# https://review.openstack.org/#/c/87295/
-Patch0014:	Allow-install-mariadb-from-RDO-repository.patch
-
-# https://review.openstack.org/#/c/86889/
-Patch0015:	Make-innodb-pool-size-configurable.patch
-
-# https://review.openstack.org/#/c/90245/
-Patch0016:	Fix-var-lib-mysql-selinux-labeling.patch
-
-# https://review.openstack.org/#/c/91482/
-Patch0017:	Fix-rabbitmq-server-selinux-labeling.patch
-
-# https://review.openstack.org/#/c/102687/
-Patch0018:	Change-default-swift-ports.patch
-
-# https://review.openstack.org/#/c/91704
-# This patch is actually a simplified version of the above.
-# The upstream patch would require also backporting the
-# sysctl element, so we'll just change the port manually.
-Patch0019:	Move-rabbitmq-server-cluster-port.patch
-
 BuildArch:	noarch
 BuildRequires:	python
 BuildRequires:	python2-devel
@@ -96,27 +25,7 @@ diskimage-builder that can be used to build OpenStack images for the TripleO
 program.
 
 %prep
-%setup -q -n tripleo-image-elements-%{version}
-
-%patch0001 -p1
-%patch0002 -p1
-%patch0003 -p1
-%patch0004 -p1
-%patch0005 -p1
-%patch0006 -p1
-%patch0007 -p1
-%patch0008 -p1
-%patch0009 -p1
-%patch0010 -p1
-%patch0011 -p1
-%patch0012 -p1
-%patch0013 -p1
-%patch0014 -p1
-%patch0015 -p1
-%patch0016 -p1
-%patch0017 -p1
-%patch0018 -p1
-%patch0019 -p1
+%setup -q -n tripleo-image-elements-%{upstream_version}
 
 %build
 %{__python} setup.py build
@@ -126,27 +35,6 @@ program.
 
 # remove .git-keep-empty files that get installed
 find %{buildroot} -name .git-keep-empty | xargs rm -f
-
-# These are the scripts created by our patches, but the patches don't bring +x
-# along with them, so to avoid some rpmlint errors, +x them here. Once patches
-# are marged upstream, these lines can be removed.
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/nova-baremetal/os-refresh-config/configure.d/82-nova-baremetal-selinux
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/keystone/os-refresh-config/configure.d/10-keystone-state
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/keystone/os-refresh-config/configure.d/20-keystone-selinux
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/neutron/os-refresh-config/configure.d/10-neutron-state
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/neutron/os-refresh-config/configure.d/20-neutron-selinux
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/glance/os-refresh-config/configure.d/10-glance-state
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/glance/os-refresh-config/configure.d/20-glance-selinux
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/swift-storage/os-refresh-config/configure.d/10-swift-storage-state
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/swift-storage/os-refresh-config/configure.d/20-swift-storage-selinux
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/nova/os-refresh-config/configure.d/20-nova-selinux
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb/install.d/10-mariadb-packages
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-common/install.d/11-mariadb
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-common/os-refresh-config/post-configure.d/40-mariadb
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-common/os-refresh-config/pre-configure.d/50-mariadb-socket
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-rdo/install.d/10-mariadb-packages
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/mariadb-dev-rdo/install.d/03-mariadb-dev
-chmod +x %{buildroot}/%{_datarootdir}/tripleo-image-elements/rabbitmq-server/os-refresh-config/configure.d/20-rabbitmq-server-selinux
 
 %files
 %doc LICENSE
