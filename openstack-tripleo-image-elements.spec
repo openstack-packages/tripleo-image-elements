@@ -1,16 +1,25 @@
+%global commit0 7fca8a174e251cac049fa1b4bd79cfbc3b34e9fe
+%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
+%global service tripleo-image-elements
+
+%{!?upstream_version: %global upstream_version %{version}}
+
+
 # Turn off the brp-python-bytecompile script
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
 Name:		openstack-tripleo-image-elements
 Summary:	OpenStack TripleO Image Elements for diskimage-builder
-Version:    XXX
-Release:    XXX{?dist}
+Version:    0.9.7
+Release:    1%{?dist}
 License:	ASL 2.0
 Group:		System Environment/Base
 URL:		https://wiki.openstack.org/wiki/TripleO
-Source0:	http://tarballs.openstack.org/tripleo-image-elements/tripleo-image-elements-%{version}.tar.gz
+# Once we have stable branches and stable releases we can go back to using release tarballs
+Source0:    https://github.com/openstack/%{service}/archive/%{commit0}.tar.gz#/%{service}-%{shortcommit0}.tar.gz
 
 BuildArch:	noarch
+BuildRequires:  git
 BuildRequires:	python
 BuildRequires:	python2-devel
 BuildRequires:	python-setuptools
@@ -25,7 +34,7 @@ diskimage-builder that can be used to build OpenStack images for the TripleO
 program.
 
 %prep
-%setup -q -n tripleo-image-elements-%{upstream_version}
+%autosetup -n %{service}-%{commit0} -S git
 
 %build
 %{__python} setup.py build
@@ -44,7 +53,7 @@ if [ -f $manifest_file ]; then
     TMP_HOOKS_PATH=$(mktemp -d)
     IMAGE_ELEMENT=$(cat $manifest_file)
     ELEMENTS_PATH=/usr/share/instack-undercloud/:/usr/share/tripleo-image-elements/:/usr/share/diskimage-builder/elements/
-    generate_hooks 
+    generate_hooks
 
     # os-apply-config templates
     TEMPLATE_ROOT=/usr/libexec/os-apply-config/templates
@@ -72,12 +81,13 @@ true
 %files
 %doc LICENSE
 %doc README.md
-%doc AUTHORS
-%doc ChangeLog
 %{python_sitelib}/tripleo_image_elements*
 %{_datadir}/tripleo-image-elements
 
 %changelog
+* Mon Oct 19 2015 John Trowbridge <trown@redhat.com> - 0.9.7-1
+- Use a source tarball for a git hash that has passed delorean CI for liberty release
+
 * Tue Oct 28 2014 James Slagle <jslagle@redhat.com> 0.8.10-8
 - Increase rabbitmq timeout
 - Copy static files for packaged installs
