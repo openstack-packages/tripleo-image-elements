@@ -1,0 +1,7 @@
+Verified+1: rdo-ci-jenkins <whayutin+rdocijenkins@redhat.com>
+Code-Review+2: Alan Pevec <alan.pevec@redhat.com>
+Submitted-by: Alan Pevec <alan.pevec@redhat.com>
+Submitted-at: Fri, 19 Feb 2016 23:09:04 +0100
+Reviewed-on: https://review.gerrithub.io/263798
+Project: openstack-packages/tripleo-image-elements
+Branch: refs/heads/rpm-master
