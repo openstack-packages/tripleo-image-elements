@@ -1,14 +1,17 @@
 # Turn off the brp-python-bytecompile script
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
+
+%{!?upstream_version: %global upstream_version %{version}%{?milestone}}
+
 Name:		openstack-tripleo-image-elements
 Summary:	OpenStack TripleO Image Elements for diskimage-builder
-Version:    XXX
-Release:    XXX
+Version:    0.9.9
+Release:    1%{?dist}
 License:	ASL 2.0
 Group:		System Environment/Base
 URL:		https://wiki.openstack.org/wiki/TripleO
-Source0:	http://tarballs.openstack.org/tripleo-image-elements/tripleo-image-elements-%{version}.tar.gz
+Source0:	http://tarballs.openstack.org/tripleo-image-elements/tripleo-image-elements-%{version}%{?milestone}.tar.gz
 
 BuildArch:	noarch
 BuildRequires:	python
@@ -78,3 +81,5 @@ true
 %{_datadir}/tripleo-image-elements
 
 %changelog
+* Wed Mar 30 2016 RDO <rdo-list@redhat.com> 0.9.9-1
+- RC1 Rebuild for Mitaka RC1 0.9.9
